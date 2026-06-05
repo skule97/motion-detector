@@ -1,13 +1,10 @@
 #%%
 import cv2
-import os
 import numpy as np
-
-import torchvision.ops as ops
 
 class MotionDetector:
     
-    def __init__(self, kernel_size=(9, 9), threshold=20, area_threshold=1000):
+    def __init__(self, kernel_size=(9, 9), threshold=20, area_threshold=500):
         self.kernel = np.ones(kernel_size, dtype=np.uint8)
         self.threshold = threshold
         self.area_threshold = area_threshold
@@ -43,28 +40,9 @@ class MotionDetector:
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel, iterations=1) #macht Löcher zu
         mask = cv2.dilate(mask, self.kernel, iterations=4)  #macht objkete größer, damit sie besser erkannt werden können
 
-
         return mask
 
 
-    # compute motion mask
-    #kernel = np.ones((9,9), dtype=np.uint8)
-    #mask = get_mask(img1_gray,img2_gray, kernel)
-
-    #cv2.imwrite('/home/jt/Documents/Programmieren/Bildverarbeitung/nachtbildkammera/mask.jpeg', mask)
-        """
-    def find_contour(self, mask=None):
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
-                                            cv2.CHAIN_APPROX_TC89_L1)
-            detected_objects = []
-
-            for contour in contours:
-                x,y,w,h = cv2.boundingRect(contour)
-                area = w * h
-                if area > self.area_threshold:  # Area muss bestimmte größe haben damit Objekt angezeigt
-                        detected_objects.append((x, y, w, h))
-            return np.array(detected_objects)
-        """
     def find_contour(self, mask=None):
         if mask is None:
             mask = self.get_mask()
@@ -134,19 +112,4 @@ class MotionDetector:
                 if iou > threshold:
                     order.remove(j)
         return boxes[keep]
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
 # %%
