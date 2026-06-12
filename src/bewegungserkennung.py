@@ -28,7 +28,7 @@ class MotionDetector:
             frame1, frame2 = self.img1_gray, self.img2_gray
 
         #-------Stabilisierung des Bildes-----------
-        pic1=cv2.goodFeatureToTrack(frame1, maxCorners=200,
+        pic1=cv2.goodFeaturesToTrack(frame1, maxCorners=300,
                                 qualityLevel=0.01, minDistance=30)
         if pic1 is not None and len(pic1) > 4:
             pic2, status, _ = cv2.calcOpticalFlowPyrLK(frame1, frame2, pic1, None)
