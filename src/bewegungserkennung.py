@@ -4,7 +4,7 @@ import numpy as np
 
 class MotionDetector:
     
-    def __init__(self, kernel_size=(9, 9), threshold=20, area_threshold=500):
+    def __init__(self, kernel_size=(9, 9), threshold=20, area_threshold=1700):
         self.kernel = np.ones(kernel_size, dtype=np.uint8)
         self.threshold = threshold
         self.area_threshold = area_threshold
@@ -26,7 +26,21 @@ class MotionDetector:
 
         if frame1 is None or frame2 is None:
             frame1, frame2 = self.img1_gray, self.img2_gray
+
+        #-------Stabilisierung des Bildes-----------
+        pic1=cv2.goodFeatureToTrack(frame1, maxCorners=200,
+                                qualityLevel=0.01, minDistance=30)
+        if pic1 is not None and len(pic1) > 4:
+            pic2, status, _ = cv2.calcOpticalFlowPyrLK(frame1, frame2, pic1, None)
+            idx=status.ravel()==1
+            if idx.sum() > 4:
+                M, _ = cv2.estimateAffinePartial2D(pic1[idx], pic2[idx])
+            if M is not None:
+                h, w = frame2.shape
+                frame2 = cv2.warpAffine(frame2, M, (w, h),
+                                         flags=cv2.WARP_INVERSE_MAP)
         
+        #--------------------------------------------
         frame_diff=cv2.absdiff(frame2,frame1)
         
         #macht aus Bild binäres Bild(graustufen zu schwart und weiß)
